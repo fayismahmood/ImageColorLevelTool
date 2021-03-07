@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div>
+      <img width="500" src="./pic.jpg" alt="" />
+    </div>
+    <div>
+      <h3>Result</h3>
+      <canvas width="500" height="500"></canvas>
+    </div>
+    <div>
+      <h3>controls</h3>
+      <div>
+        <div>
+          All<input type="range" col="all" name="" id="" min="-225" max="255" />
+        </div>
+        <div>
+          Red<input type="range" col="red" name="" id="" min="-225" max="255" />
+        </div>
+        <div>
+          Green<input
+            type="range"
+            col="green"
+            name=""
+            id=""
+            min="-225"
+            max="255"
+          />
+        </div>
+        <div>
+          Blue<input
+            type="range"
+            col="blue"
+            name=""
+            id=""
+            min="-225"
+            max="255"
+          />
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+<script>
+  let canvas = document.querySelector("canvas");
+  let img = document.querySelector("img");
+  let _ranges = document.querySelectorAll("input");
+
+  let ctx = canvas.getContext("2d");
+
+  let imgData;
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0);
+
+    imgData = ctx.getImageData(0, 0, 500, 500);
+
+    let _colType = {
+      all: 0,
+      red: 0,
+      green: 1,
+      blue: 2,
+    };
+    _ranges.forEach((e) => {
+      e.onchange = () => {
+        let col = e.getAttribute("col");
+        let _val = e.value;
+
+        _colType[col] = Number(_val);
+        console.log(_colType);
+
+        let _unit = new Uint8ClampedArray(1000000);
+        for (let index = 0; index < _unit.length; index++) {
+          _unit[index] = imgData.data[index];
+        }
+        console.log(_unit);
+        let DimgData = new ImageData(_unit, 500);
+        for (let index = 0; index < DimgData.data.length; index = index + 4) {
+          DimgData.data[index] += Number(_colType.all + _colType.red);
+          DimgData.data[index + 1] += Number(_colType.all + _colType.green);
+          DimgData.data[index + 2] += Number(_colType.all + _colType.blue);
+          // console.log(DimgData.data[index], _val);
+        }
+
+        console.log(_val, DimgData.data);
+        ctx.clearRect(0, 0, 500, 500);
+        ctx.putImageData(DimgData, 0, 0);
+      };
+    });
+  };
+</script>
